@@ -54,6 +54,9 @@ A simple, secure user authentication system built with Node.js, Express, and SQL
   - Clear code structure in `index.js`; separate concerns if expanding.
 - **Validation**
   - Use Joi for request input validation: define and enforce schemas for all API endpoints (e.g. required fields, types, lengths).
+- **Testing**
+  - Integration tests covering all API endpoints using Jest & Supertest.
+  - Tests runnable via `npm test` for CI/CD.
 
 ## 6. Environment & Configuration
 

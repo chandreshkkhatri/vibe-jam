@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: User Authentication API
+  version: 1.0.0
+  description: Simple secure user authentication with JWT and refresh tokens
+servers:
+  - url: http://localhost:8000
+    description: Local server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Credentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    AccessToken:
+      type: object
+      properties:
+        accessToken:
+          type: string
+    RefreshRequest:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+paths:
+  /register:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /login:
+    post:
+      summary: Authenticate user and get tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        "400":
+          description: Invalid credentials or validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessToken"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Invalid or revoked refresh token
+  /profile:
+    get:
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden (invalid token)
+        "404":
+          description: User not found
