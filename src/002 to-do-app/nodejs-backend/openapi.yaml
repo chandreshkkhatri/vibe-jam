@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Todo App API
+  version: 1.0.0
+  description: API documentation for the Todo App
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, archived]
+        due_date:
+          type: string
+          format: date
+        priority:
+          type: string
+          enum: [low, medium, high]
+        tags:
+          type: array
+          items:
+            type: string
+paths:
+  /todos:
+    get:
+      summary: Get all todos
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: priority
+          schema:
+            type: string
+        - in: query
+          name: tags
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: includeArchived
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  todos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Todo"
