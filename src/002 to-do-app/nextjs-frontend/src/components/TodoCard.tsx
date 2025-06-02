@@ -144,7 +144,8 @@ export default function TodoCard({
                       </span>
                     )}
                   </span>
-                </div>              )}
+                </div>
+              )}
             </div>
 
             {/* Tags */}
