@@ -4,10 +4,8 @@ export interface Todo {
   description?: string;
   due_date?: string; // ISO date string
   priority: "low" | "medium" | "high";
-  status: "pending" | "in-progress" | "completed" | "archived";
+  status: "pending" | "completed" | "archived";
   tags?: string[];
-  created_at: string; // ISO date string
-  updated_at: string; // ISO date string
 }
 
 export interface CreateTodoRequest {
@@ -23,7 +21,7 @@ export interface UpdateTodoRequest {
   description?: string;
   due_date?: string;
   priority?: "low" | "medium" | "high";
-  status?: "pending" | "in-progress" | "completed" | "archived";
+  status?: "pending" | "completed" | "archived";
   tags?: string[];
 }
 
@@ -31,8 +29,8 @@ export interface TodoFilters {
   status?: string;
   priority?: string;
   tags?: string;
-  sort?: "due_date" | "priority" | "created_at";
-  order?: "asc" | "desc";
+  sortBy?: "due_date" | "priority";
+  sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
 }

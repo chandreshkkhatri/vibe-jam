@@ -6,10 +6,8 @@ import {
   Tag,
   Edit2,
   Trash2,
-  Clock,
   CheckCircle,
   Circle,
-  Play,
 } from "lucide-react";
 import { Todo } from "@/types/todo";
 import {
@@ -37,9 +35,6 @@ export default function TodoCard({
 
     switch (todo.status) {
       case "pending":
-        nextStatus = "in-progress";
-        break;
-      case "in-progress":
         nextStatus = "completed";
         break;
       case "completed":
@@ -51,13 +46,10 @@ export default function TodoCard({
 
     onStatusChange(todo.id, nextStatus);
   };
-
   const getStatusIcon = () => {
     switch (todo.status) {
       case "completed":
         return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case "in-progress":
-        return <Play className="w-5 h-5 text-blue-600" />;
       default:
         return <Circle className="w-5 h-5 text-gray-400" />;
     }
@@ -152,14 +144,7 @@ export default function TodoCard({
                       </span>
                     )}
                   </span>
-                </div>
-              )}
-
-              {/* Created At */}
-              <div className="flex items-center space-x-1 text-gray-400">
-                <Clock className="w-3 h-3" />
-                <span>Created {formatDate(todo.created_at)}</span>
-              </div>
+                </div>              )}
             </div>
 
             {/* Tags */}

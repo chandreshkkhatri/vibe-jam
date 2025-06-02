@@ -38,7 +38,6 @@ class TodoAPI {
       throw error;
     }
   }
-
   async getTodos(filters: TodoFilters = {}): Promise<TodosResponse> {
     const searchParams = new URLSearchParams();
 
@@ -51,7 +50,23 @@ class TodoAPI {
     const queryString = searchParams.toString();
     const endpoint = `/todos${queryString ? `?${queryString}` : ""}`;
 
-    return this.request<TodosResponse>(endpoint);
+    const response = await this.request<{
+      total: number;
+      page: number;
+      limit: number;
+      todos: Todo[];
+    }>(endpoint);
+
+    // Transform backend response to frontend format
+    return {
+      todos: response.todos,
+      pagination: {
+        page: response.page,
+        limit: response.limit,
+        total: response.total,
+        totalPages: Math.ceil(response.total / response.limit),
+      },
+    };
   }
 
   async getTodo(id: string): Promise<Todo> {
@@ -71,9 +86,8 @@ class TodoAPI {
       body: JSON.stringify(updates),
     });
   }
-
-  async deleteTodo(id: string): Promise<{ message: string }> {
-    return this.request<{ message: string }>(`/todos/${id}`, {
+  async deleteTodo(id: string): Promise<Todo> {
+    return this.request<Todo>(`/todos/${id}`, {
       method: "DELETE",
     });
   }

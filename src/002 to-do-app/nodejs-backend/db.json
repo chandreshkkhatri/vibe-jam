@@ -1,3 +1,40 @@
 {
-    "todos": []
+  "todos": [
+    {
+      "id": "ea9b6ba4-ec76-4b87-a776-e2b59106a221",
+      "title": "Test Todo Item",
+      "description": "This is a test todo to verify the API is working",
+      "status": "pending",
+      "due_date": "2025-06-10",
+      "priority": "high",
+      "tags": [
+        "testing",
+        "api"
+      ]
+    },
+    {
+      "id": "989e920d-5a58-4e22-b89d-79c7791ac6d2",
+      "title": "Buy groceries",
+      "description": "Milk, eggs, bread, fruits",
+      "status": "completed",
+      "due_date": "2025-06-05",
+      "priority": "medium",
+      "tags": [
+        "shopping",
+        "errands"
+      ]
+    },
+    {
+      "id": "bd3c05a7-25e0-480b-9703-706c9be65c3c",
+      "title": "Finish project documentation",
+      "description": "Complete the API documentation and user guide",
+      "status": "pending",
+      "due_date": "2025-06-15",
+      "priority": "low",
+      "tags": [
+        "work",
+        "documentation"
+      ]
+    }
+  ]
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Filter, ArrowUpDown, Search, X } from "lucide-react";
-import { TodoFilters } from "@/types/todo";
+import type { TodoFilters } from "@/types/todo";
 
 interface TodoFiltersProps {
   filters: TodoFilters;
@@ -35,7 +35,7 @@ export default function TodoFilters({
   };
 
   const hasActiveFilters =
-    filters.status || filters.priority || filters.tags || filters.sort;
+    filters.status || filters.priority || filters.tags || filters.sortBy;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 space-y-4">
@@ -78,9 +78,9 @@ export default function TodoFilters({
             onChange={(e) => handleFilterChange("status", e.target.value)}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
+            {" "}
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
             <option value="archived">Archived</option>
           </select>
@@ -118,15 +118,15 @@ export default function TodoFilters({
           </label>
           <select
             id="sort-filter"
-            value={`${filters.sort || ""}-${filters.order || ""}`}
+            value={`${filters.sortBy || ""}-${filters.sortOrder || ""}`}
             onChange={(e) => {
-              const [sort, order] = e.target.value.split("-");
-              if (sort && order) {
-                handleFilterChange("sort", sort);
-                handleFilterChange("order", order);
+              const [sortBy, sortOrder] = e.target.value.split("-");
+              if (sortBy && sortOrder) {
+                handleFilterChange("sortBy", sortBy);
+                handleFilterChange("sortOrder", sortOrder);
               } else {
-                handleFilterChange("sort", "");
-                handleFilterChange("order", "");
+                handleFilterChange("sortBy", "");
+                handleFilterChange("sortOrder", "");
               }
             }}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -202,13 +202,13 @@ export default function TodoFilters({
             </span>
           )}
 
-          {filters.sort && (
+          {filters.sortBy && (
             <span className="inline-flex items-center px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">
-              Sort: {filters.sort} ({filters.order})
+              Sort: {filters.sortBy} ({filters.sortOrder})
               <button
                 onClick={() => {
-                  handleFilterChange("sort", "");
-                  handleFilterChange("order", "");
+                  handleFilterChange("sortBy", "");
+                  handleFilterChange("sortOrder", "");
                 }}
                 className="ml-1 hover:bg-orange-200 rounded-full p-0.5"
               >
