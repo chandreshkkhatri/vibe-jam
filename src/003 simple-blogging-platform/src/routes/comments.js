@@ -2,6 +2,7 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const db = require("../config/database");
 const { authMiddleware, ownershipMiddleware } = require("../middleware/auth");
+const { sanitizeString } = require("../utils/helpers");
 
 const router = express.Router();
 
@@ -21,23 +22,26 @@ router.get("/:id/comments", (req, res) => {
 router.post(
   "/:id/comments",
   authMiddleware,
-  [body("content").notEmpty()],
-  (req, res) => {
+  [body("content").notEmpty()],  (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     const { content } = req.body;
+    
+    // Sanitize user input to prevent XSS and injection attacks
+    const sanitizedContent = sanitizeString(content);
+    
     const author_id = req.user.id;
     const blog_entry_id = req.params.id;
     db.run(
       "INSERT INTO comments (content, author_id, blog_entry_id) VALUES (?, ?, ?)",
-      [content, author_id, blog_entry_id],
+      [sanitizedContent, author_id, blog_entry_id],
       function (err) {
         if (err)
           return res.status(500).json({ error: "Failed to add comment" });
         res
           .status(201)
-          .json({ id: this.lastID, content, author_id, blog_entry_id });
+          .json({ id: this.lastID, content: sanitizedContent, author_id, blog_entry_id });
       }
     );
   }

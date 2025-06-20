@@ -13,13 +13,25 @@ function isValidEmail(email) {
 }
 
 /**
- * Sanitizes string input by removing potentially harmful characters
+ * Sanitizes string input by removing potentially harmful characters and HTML tags
  * @param {string} input - Input string to sanitize
  * @returns {string} - Sanitized string
  */
 function sanitizeString(input) {
   if (typeof input !== "string") return "";
-  return input.trim().replace(/[<>]/g, "");
+  
+  return input
+    .trim()
+    // Remove script tags and their content first
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    // Remove all HTML tags
+    .replace(/<[^>]*>/g, "")
+    // Remove javascript: protocol
+    .replace(/javascript:/gi, "")
+    // Remove on* event handlers (like onclick, onload, etc.)
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, "")
+    // Remove any remaining < or > characters
+    .replace(/[<>]/g, "");
 }
 
 /**

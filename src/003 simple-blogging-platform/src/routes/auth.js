@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const db = require("../config/database");
+const { sanitizeString } = require("../utils/helpers");
 
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET || "dev_secret";
@@ -10,22 +11,25 @@ const SECRET = process.env.JWT_SECRET || "dev_secret";
 // Register
 router.post(
   "/register",
-  [body("email").isEmail(), body("password").isLength({ min: 6 })],
-  (req, res) => {
+  [body("email").isEmail(), body("password").isLength({ min: 6 })],  (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     const { email, password } = req.body;
+    
+    // Sanitize email input to prevent injection attacks
+    const sanitizedEmail = sanitizeString(email);
+    
     const password_hash = bcrypt.hashSync(password, 10);
     db.run(
       "INSERT INTO users (email, password_hash) VALUES (?, ?)",
-      [email, password_hash],
+      [sanitizedEmail, password_hash],
       function (err) {
         if (err) {
           return res.status(400).json({ error: "Email already in use" });
         }
-        const user = { id: this.lastID, email };
+        const user = { id: this.lastID, email: sanitizedEmail };
         const token = jwt.sign(user, SECRET, { expiresIn: "7d" });
         res.status(201).json({ user, token });
       }
@@ -36,14 +40,17 @@ router.post(
 // Login
 router.post(
   "/login",
-  [body("email").isEmail(), body("password").exists()],
-  (req, res) => {
+  [body("email").isEmail(), body("password").exists()],  (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     const { email, password } = req.body;
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+    
+    // Sanitize email input to prevent injection attacks
+    const sanitizedEmail = sanitizeString(email);
+    
+    db.get("SELECT * FROM users WHERE email = ?", [sanitizedEmail], (err, user) => {
       if (err || !user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }

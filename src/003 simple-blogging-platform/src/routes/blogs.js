@@ -2,6 +2,7 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const db = require("../config/database");
 const { authMiddleware, ownershipMiddleware } = require("../middleware/auth");
+const { sanitizeString } = require("../utils/helpers");
 
 const router = express.Router();
 
@@ -38,20 +39,24 @@ router.get("/:id", (req, res) => {
 router.post(
   "/",
   authMiddleware,
-  [body("title").notEmpty(), body("content").notEmpty()],
-  (req, res) => {
+  [body("title").notEmpty(), body("content").notEmpty()],  (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     const { title, content } = req.body;
+    
+    // Sanitize user input to prevent XSS and injection attacks
+    const sanitizedTitle = sanitizeString(title);
+    const sanitizedContent = sanitizeString(content);
+    
     const author_id = req.user.id;
     db.run(
       "INSERT INTO blog_entries (title, content, author_id) VALUES (?, ?, ?)",
-      [title, content, author_id],
+      [sanitizedTitle, sanitizedContent, author_id],
       function (err) {
         if (err)
           return res.status(500).json({ error: "Failed to create blog entry" });
-        res.status(201).json({ id: this.lastID, title, content, author_id });
+        res.status(201).json({ id: this.lastID, title: sanitizedTitle, content: sanitizedContent, author_id });
       }
     );
   }
@@ -62,21 +67,21 @@ router.put(
   "/:id",
   authMiddleware,
   ownershipMiddleware("blog"),
-  [body("title").optional().notEmpty(), body("content").optional().notEmpty()],
-  (req, res) => {
+  [body("title").optional().notEmpty(), body("content").optional().notEmpty()],  (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     const { title, content } = req.body;
     const updates = [];
     const params = [];
+    
     if (title) {
       updates.push("title = ?");
-      params.push(title);
+      params.push(sanitizeString(title));
     }
     if (content) {
       updates.push("content = ?");
-      params.push(content);
+      params.push(sanitizeString(content));
     }
     if (updates.length === 0)
       return res.status(400).json({ error: "No fields to update" });
