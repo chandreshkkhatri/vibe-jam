@@ -45,7 +45,7 @@ router.post(
 
 // Delete comment
 router.delete(
-  "/:id", // Changed from "/comments/:id"
+  "/comments/:id",
   authMiddleware,
   ownershipMiddleware("comment"),
   (req, res) => {
